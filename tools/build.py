@@ -1,44 +1,12 @@
-import os
 import shutil
 from collections import defaultdict
 from io import StringIO
-from pathlib import Path
 
 import unidata_blocks
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
 from tools import fonts_dir, www_fonts_dir, www_css_dir, font_styles, language_flavors
-
-
-def _alphabet_to_text(alphabet: list[int]) -> str:
-    return ''.join(chr(code_point) for code_point in sorted(alphabet))
-
-
-def _alphabet_to_unicode_range(alphabet: list[int]) -> list[str]:
-    pairs = []
-    code_start = None
-    code_end = None
-    for code_point in sorted(alphabet):
-        if code_start is None:
-            assert code_end is None
-            code_start = code_point
-            code_end = code_point
-        elif code_point == code_end + 1:
-            code_end = code_point
-        else:
-            pairs.append((code_start, code_end))
-            code_start = code_point
-            code_end = code_point
-    pairs.append((code_start, code_end))
-
-    unicode_range = []
-    for code_start, code_end in pairs:
-        if code_start == code_end:
-            unicode_range.append(f'U+{code_start:04X}')
-        else:
-            unicode_range.append(f'U+{code_start:04X}-{code_end:04X}')
-    return unicode_range
 
 
 def _get_slice_alphabets(alphabet: list[int]) -> list[tuple[str, list[int]]]:
@@ -62,14 +30,34 @@ def _get_slice_alphabets(alphabet: list[int]) -> list[tuple[str, list[int]]]:
     return slice_alphabets
 
 
-def _slice_font(font_path: Path, output_font_path: Path, alphabet: list[int]):
-    args = [
-        os.fspath(font_path),
-        f'--text={_alphabet_to_text(alphabet)}',
-        "--layout-features='*'",
-        f'--output-file={os.fspath(output_font_path)}',
-    ]
-    subset.main(args)
+def _alphabet_to_text(alphabet: list[int]) -> str:
+    return ''.join(chr(code_point) for code_point in sorted(alphabet))
+
+
+def _alphabet_to_unicode_range(alphabet: list[int]) -> str:
+    pairs = []
+    code_start = None
+    code_end = None
+    for code_point in sorted(alphabet):
+        if code_start is None:
+            assert code_end is None
+            code_start = code_point
+            code_end = code_point
+        elif code_point == code_end + 1:
+            code_end = code_point
+        else:
+            pairs.append((code_start, code_end))
+            code_start = code_point
+            code_end = code_point
+    pairs.append((code_start, code_end))
+
+    unicode_range = []
+    for code_start, code_end in pairs:
+        if code_start == code_end:
+            unicode_range.append(f'U+{code_start:04X}')
+        else:
+            unicode_range.append(f'U+{code_start:04X}-{code_end:04X}')
+    return ', '.join(unicode_range)
 
 
 def main():
@@ -93,11 +81,17 @@ def main():
 
             output_font_dir = www_fonts_dir.joinpath(font_style, language_flavor.lower())
             output_font_dir.mkdir(parents=True)
+
             for slice_name, slice_alphabet in slice_alphabets:
                 print(f'{slice_name}: {len(slice_alphabet)}')
 
                 output_font_path = output_font_dir.joinpath(f'SourceHan{font_style.capitalize()}-{language_flavor}-VF-{slice_name}.otf.woff2')
-                _slice_font(font_path, output_font_path, slice_alphabet)
+                subset.main([
+                    f'{font_path}',
+                    f'--text={_alphabet_to_text(slice_alphabet)}',
+                    "--layout-features='*'",
+                    f'--output-file={output_font_path}',
+                ])
                 print(f"Make Font: '{output_font_path}'")
 
                 language_flavor_css.write('\n')
@@ -105,7 +99,7 @@ def main():
                 language_flavor_css.write(f'    font-family: SourceHan{font_style.capitalize()}-{language_flavor};\n')
                 language_flavor_css.write('    font-display:  swap;\n')
                 language_flavor_css.write(f'    src: url("../fonts/{font_style}/{language_flavor.lower()}/{output_font_path.name}") format("woff2");\n')
-                language_flavor_css.write(f'    unicode-range: {', '.join(_alphabet_to_unicode_range(slice_alphabet))};\n')
+                language_flavor_css.write(f'    unicode-range: {_alphabet_to_unicode_range(slice_alphabet)};\n')
                 language_flavor_css.write('}\n')
 
             language_flavor_css_path = www_css_dir.joinpath(f'{font_style}-{language_flavor.lower()}.css')
