@@ -141,5 +141,5 @@ cython_debug/
 .idea/
 
 # Project
-www/fonts
-www/css
+www/fonts/
+www/css/
