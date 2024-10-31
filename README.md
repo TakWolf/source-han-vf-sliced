@@ -46,7 +46,7 @@ h1 {
 ## 字体版本
 
 - [思源黑体 - 2.004R](https://github.com/adobe-fonts/source-han-sans/releases/tag/2.004R)
-- [思源宋体 - 2.002R](https://github.com/adobe-fonts/source-han-serif/releases/tag/2.002R)
+- [思源宋体 - 2.003R](https://github.com/adobe-fonts/source-han-serif/releases/tag/2.003R)
 
 ## 程序依赖
 
