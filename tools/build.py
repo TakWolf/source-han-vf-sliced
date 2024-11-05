@@ -97,7 +97,7 @@ def main():
                 language_flavor_css.write('\n')
                 language_flavor_css.write('@font-face {\n')
                 language_flavor_css.write(f'    font-family: SourceHan{font_style.capitalize()}-{language_flavor};\n')
-                language_flavor_css.write('    font-display:  swap;\n')
+                language_flavor_css.write('    font-display: swap;\n')
                 language_flavor_css.write(f'    src: url("../fonts/{font_style}/{language_flavor.lower()}/{output_font_path.name}") format("woff2");\n')
                 language_flavor_css.write(f'    unicode-range: {_alphabet_to_unicode_range(slice_alphabet)};\n')
                 language_flavor_css.write('}\n')
