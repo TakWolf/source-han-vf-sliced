@@ -51,7 +51,6 @@ h1 {
 ## 程序依赖
 
 - [FontTools](https://github.com/fonttools/fonttools)
-- [Brotli](https://github.com/google/brotli)
 - [Unidata Blocks](https://github.com/TakWolf/unidata-blocks)
 
 ## 参考资料
