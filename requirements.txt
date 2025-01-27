@@ -1,3 +1,2 @@
-fonttools==4.54.1
-Brotli==1.1.0
-unidata-blocks==0.0.15
+fonttools[woff]==4.56.0
+unidata-blocks==0.0.16
