@@ -1,2 +1,2 @@
-fonttools[woff]==4.56.0
+fonttools[woff]==4.58.4
 unidata-blocks==0.0.16
